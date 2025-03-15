@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const codeContent = document.querySelector('.code-content'); //  `<pre><code>`
-    const githubLink = document.querySelector('a').href;
+    const githubLink = document.querySelector('a').href; // Get the GitHub link
+    const codeContainer = document.querySelector(".code-container");
+    const tabButtonsContainer = document.querySelector('.tab-buttons');
+    const tabContentsContainer = document.querySelector('.tab-contents');
+
 
     // --- Dark Mode Toggle (Keep as is) ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
@@ -27,17 +30,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // --- End Dark Mode Toggle ---
 
-    if (codeContent && githubLink) {
-        fetchRepoContents(githubLink, codeContent, ""); // Start at the root
+    if (githubLink) {
+        fetchRepoContents(githubLink, ""); // Start at the root
     }
 
-    async function fetchRepoContents(repoURL, codeContainer, currentPath) {
+    async function fetchRepoContents(repoURL, currentPath) {
         try {
-            // 1. Extract owner and repo name
+            // Extract owner and repo name
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`;
+            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/game/${currentPath}`; //added game
 
             const response = await fetch(apiURL);
 
@@ -47,88 +50,95 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            // Create a *new* container for the file list.
-            const fileListContainer = document.createElement('div');
-            fileListContainer.classList.add('file-list'); // Add a class
+            // Clear existing tabs (buttons and content)
+            tabButtonsContainer.innerHTML = '';
+            tabContentsContainer.innerHTML = '';
 
-            const fileList = document.createElement('ul');
-            fileListContainer.appendChild(fileList); // Add the <ul> to the container
-
-
-            for (const item of data) {
-                const listItem = document.createElement('li');
-                const link = document.createElement('a');
-                link.textContent = item.name;
-                link.href = "#";  // Prevent default link behavior
-                listItem.appendChild(link);
-                fileList.appendChild(listItem);
-
-                link.addEventListener('click', async (event) => {
-                    event.preventDefault();
-
-                    if (item.type === 'file') {
-                        if (item.name.endsWith('.py')) {
-                            codeContainer.innerHTML = ''; // Clear *only* the code display area
-                            await fetchAndDisplayCode(item.download_url, codeContainer);
-                        }
-                    } else if (item.type === 'dir') {
-                        const newPath = currentPath ? `${currentPath}/${item.name}` : item.name;
-
-                        //  *Don't* clear here!  We're about to replace the file list.
-                        const backButton = document.createElement('button');
-                        backButton.textContent = 'Back';
-                        backButton.addEventListener('click', () => {
-                           const parentPath = currentPath.split('/').slice(0, -1).join('/');
-                           fetchRepoContents(repoURL, codeContainer, parentPath); // Go up one level
-                        });
-                        // Replace entire contents of codeContainer with Back button and new file list
-                        codeContainer.innerHTML = ''; // Clear for Back button and new list
-                        codeContainer.appendChild(backButton);
-                        fetchRepoContents(repoURL, codeContainer, newPath); // Recursive call
-                    }
-                });
-            }
-            //Clear
-            // codeContainer.innerHTML = '';
-              // Add a "Back" button (if not at the root)
+            // Add a "Back" button (if not at the root)
             if (currentPath !== "") {
                 const backButton = document.createElement('button');
                 backButton.textContent = 'Back';
+                backButton.classList.add('tab-button'); // Style it like a tab button
                 backButton.addEventListener('click', () => {
-                  const parentPath = currentPath.split('/').slice(0, -1).join('/');
-                    fetchRepoContents(repoURL, codeContainer, parentPath);
+                    const parentPath = currentPath.split('/').slice(0, -1).join('/');
+                    fetchRepoContents(repoURL,  parentPath); // Go up one level
                 });
-                codeContainer.appendChild(backButton);
-          }
-            codeContainer.appendChild(fileListContainer); // Add the *container*
+                tabButtonsContainer.appendChild(backButton); // Add to tab buttons
+            }
 
+            // Create tabs for files
+            for (const item of data) {
+              if (item.type === 'file' && item.name.endsWith('.py')) {
+                    await createTab(item.name, item.download_url);
+              } else if (item.type === 'dir') {
+                    const dirButton = document.createElement('button');
+                    dirButton.textContent = item.name + "/";
+                    dirButton.classList.add('tab-button'); //style
+                    dirButton.addEventListener('click', () => {
+                        const newPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+                        fetchRepoContents(repoURL, newPath);
+                    });
+                tabButtonsContainer.appendChild(dirButton);
+              }
+            }
+
+            // Activate the first tab by default (if there are any)
+            const firstTabButton = tabButtonsContainer.querySelector('.tab-button');
+            if (firstTabButton) {
+                firstTabButton.click();
+            }
 
         } catch (error) {
-            codeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+             const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.textContent = `Error: ${error.message}`;
+            pre.appendChild(code);
+            tabContentsContainer.appendChild(pre); // Display errors
         }
     }
 
+    async function createTab(filename, downloadURL) {
+        // Create tab button
+        const button = document.createElement('button');
+        button.textContent = filename;
+        button.classList.add('tab-button');
+        button.dataset.filename = filename;
+        tabButtonsContainer.appendChild(button);
 
-    async function fetchAndDisplayCode(downloadURL, container) {
+        // Create tab content container
+        const tabContent = document.createElement('div');
+        tabContent.classList.add('tab-content');
+        tabContent.dataset.filename = filename;
+
+        // Fetch and add code to tab content
         try {
             const response = await fetch(downloadURL);
             if (!response.ok) {
-                throw new Error(`Failed to fetch file content: ${response.status}`);
+                throw new Error(`Failed to fetch ${filename}: ${response.status}`);
             }
             const codeText = await response.text();
-            const fileName = downloadURL.split('/').pop();
-              // Create a new <pre><code> block for each file
             const pre = document.createElement('pre');
             const code = document.createElement('code');
-            code.textContent = `// --- ${fileName} ---\n${codeText}\n`;
+            code.classList.add('file-content'); // Add the class for styling
+            code.textContent = codeText;
             pre.appendChild(code);
-            container.appendChild(pre);
+            tabContent.appendChild(pre);
         } catch (error) {
-            const pre = document.createElement('pre');
-            const code = document.createElement('code');
-            code.textContent = `Error loading file content: ${error.message}`;
-            pre.appendChild(code);
-            container.appendChild(pre);
+            tabContent.innerHTML = `<pre><code>Error loading ${filename}: ${error.message}</code></pre>`;
         }
+
+        tabContentsContainer.appendChild(tabContent);
+
+        // Add click event listener to the button
+        button.addEventListener('click', () => {
+            // Deactivate all tabs
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activate the clicked tab
+            button.classList.add('active');
+            tabContent.classList.add('active');
+        });
     }
+
 });

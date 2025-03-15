@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('mouseleave', () => {
         pauseGame(activeIframe);
-        activeIframe = null;
+        // activeIframe = null;
     })
 
     // Toggle code
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
             codeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
         }
     }
-    
+
   async function fetchFileContent(downloadURL, container) {
     try {
         const response = await fetch(downloadURL);

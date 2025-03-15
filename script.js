@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleButtons = document.querySelectorAll('.toggle-code');
+    const projectButtons = document.querySelectorAll('.project-button');
+    const gameContainer = document.getElementById('game-container');
+    const toggleButtons = document.querySelectorAll('.toggle-code'); //for code
+    const codeContainer = document.querySelector('.code-container'); //for code
+    let activeIframe = null; // Keep track of the active iframe
 
+    // --- Dark Mode Toggle (Keep this as is) ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
@@ -24,19 +29,49 @@ document.addEventListener('DOMContentLoaded', function() {
             darkModeToggle.textContent = "Toggle Light Mode"
         }
     });
+    // --- End Dark Mode Toggle ---
+    const projectData = {
+        project1: {
+            title: "Star Wars Arcade 1983",
+            description: "A clone of the 1983 Star Wars game",
+            iframeSrc: "star_wars_arcade/index.html",
+            githubLink: "https://github.com/joshGilstrap/Star-Wars-Arcade-1983"
+        },
+        project2: {
+            title: "Asteroids",
+            description: "Asteroids Clone",
+            iframeSrc: "asteroids/index.html",
+            githubLink: "https://github.com/joshGilstrap/Asteroids-Clone"
+        },
+        project3: {
+            title: "Space Fighter",
+            description: "Loose Space Invaders clone.",
+            iframeSrc: "space_fighter/index.html",
+            githubLink: "https://github.com/joshGilstrap/Space-Fighter"
+        }
+    };
 
-    toggleButtons.forEach(button => {
+    // --- Project Button Click Handling ---
+    projectButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const projectId = this.getAttribute('data-project');
+            loadProject(projectId);
+        });
+    });
+     // --- Code Toggle (Modified for iframe handling) ---
+        toggleButtons.forEach(button => {
         button.addEventListener('click', function() {
             const projectContainer = button.closest('.project');
-            const codeContainer = projectContainer.querySelector('.code-container');
-            const githubLink = projectContainer.querySelector('a').href;
+            const githubLink = document.getElementById("github-link").href;
 
             if (codeContainer.style.display === 'none' || codeContainer.style.display === '') {
                 codeContainer.style.display = 'block';
                 button.textContent = 'Hide Code';
 
-                if (codeContainer.querySelector('.file-list') === null) {
-                    const initialPath = "";
+                // Fetch and display the file list ONLY if it hasn't been loaded yet.
+                if (codeContainer.querySelector('.file-list') === null) { //check for file list div
+                   // Initialize with the root of the repository
+                    const initialPath = ""; // Start at the root
                     fetchRepoContents(githubLink, codeContainer, initialPath);
                 }
             } else {
@@ -113,16 +148,67 @@ document.addEventListener('DOMContentLoaded', function() {
             codeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
         }
     }
-  async function fetchFileContent(downloadURL, container) {
-    try {
-        const response = await fetch(downloadURL);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch file content: ${response.status}`);
+    async function fetchFileContent(downloadURL, container) {
+        try {
+            const response = await fetch(downloadURL);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch file content: ${response.status}`);
+            }
+            const text = await response.text();
+            container.textContent = text;
+        } catch (error) {
+            container.textContent = `Error loading file content: ${error.message}`;
         }
-        const text = await response.text();
-        container.textContent = text;
-    } catch (error) {
-        container.textContent = `Error loading file content: ${error.message}`;
     }
+    function loadProject(projectId) {
+    const projectInfo = projectData[projectId];
+
+    // Update the project information (title, description, GitHub link)
+    document.querySelector('.project h3').textContent = projectInfo.title;
+    document.querySelector('.project-description').textContent = projectInfo.description;
+    document.getElementById('github-link').href = projectInfo.githubLink;
+    document.querySelector('.code-container .code-content').textContent = ''; //clear code
+
+    // Remove the previous iframe, if any
+    if (activeIframe) {
+        gameContainer.removeChild(activeIframe);
+        activeIframe = null; // Reset activeIframe
+    }
+
+    // Create a new iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = projectInfo.iframeSrc;
+    iframe.width = "800";  // Set width (adjust as needed)
+    iframe.height = "600"; // Set height (adjust as needed)
+    iframe.frameBorder = "0";
+    iframe.classList.add('game-iframe'); // Add the class
+    // Add event listeners for pause/resume (using postMessage)
+    iframe.addEventListener('mouseenter', () => {
+        if (activeIframe !== iframe) {
+            pauseGame(activeIframe);
+            activeIframe = iframe;
+            resumeGame(activeIframe);
+        }
+    });
+    //Pause game when mouse leaves window.
+    document.addEventListener('mouseleave', () => {
+        pauseGame(activeIframe);
+        activeIframe = null;
+
+    });
+
+    gameContainer.appendChild(iframe); // Add the iframe to the container
+    activeIframe = iframe; // Set as active iframe
 }
+    function pauseGame(iframe) {
+        if (iframe) {
+            iframe.contentWindow.postMessage({ type: 'pause' }, '*');
+        }
+    }
+
+    function resumeGame(iframe) {
+        if (iframe) {
+            iframe.contentWindow.postMessage({ type: 'resume' }, '*');
+        }
+    }
 });

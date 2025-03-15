@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.project h3').textContent = projectInfo.title;
         document.querySelector('.project-description').textContent = projectInfo.description;
         document.getElementById('github-link').href = projectInfo.githubLink; //update link
-         document.querySelector('.code-container .code-content').textContent = ''; //clear code
+        document.querySelector('code-container .code-content').textContent = ''; //clear code
 
 
         // Remove the previous iframe, if any

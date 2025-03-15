@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             //Clear
-            codeContainer.innerHTML = '';
+            // codeContainer.innerHTML = '';
               // Add a "Back" button (if not at the root)
             if (currentPath !== "") {
                 const backButton = document.createElement('button');

@@ -175,6 +175,32 @@ main {
 
 }
 
+.project-list {
+    display: flex; /* Arrange buttons horizontally */
+    justify-content: center; /* Center buttons */
+    margin-bottom: 1rem;
+}
+
+.project-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.project-button:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+/* Ensure the game container has some space */
+#game-container {
+    min-height: 200px; /* Adjust as needed */
+}
+
 footer {
     text-align: center;
     padding: 1rem 0;

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const codeContent = document.querySelector('.code-content');
     const githubLink = document.querySelector('a').href;
 
-     // --- Dark Mode (Keep as is) ---
+    // --- Dark Mode (Keep as is) ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentTheme === 'dark') {
           darkModeToggle.textContent = "Toggle Light Mode"
         }
-
     }
 
     darkModeToggle.addEventListener('click', () => {
@@ -29,19 +28,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- End Dark Mode ---
 
     if (codeContent && githubLink) {
-        fetchRepoContents(githubLink, codeContent); // Call the function
+        fetchRepoContents(githubLink, codeContent, ""); // Start at the root
     }
 
-    async function fetchRepoContents(repoURL, codeContainer) {
+    async function fetchRepoContents(repoURL, codeContainer, currentPath) {
         try {
-            // 1. Extract owner, repo name, and path from the GitHub URL
+            // 1. Extract owner and repo name
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            const path = "game" // Set the path to game
-
-            // 2. Construct the API URL
-            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            //Keep consistent
+            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`;
 
             const response = await fetch(apiURL);
 
@@ -51,38 +48,83 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            //Iterate
+            //Create list
+            const fileList = document.createElement('ul');
+
             for (const item of data) {
-              if (item.type === 'file' && item.name.endsWith('.py')) { //only .py files
-                await fetchCode(item.name, codeContainer, repoURL); //await to fetch
-                }
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.textContent = item.name;
+                link.href = "#";  // Prevent default link behavior
+                listItem.appendChild(link);
+                fileList.appendChild(listItem);
+
+                link.addEventListener('click', async (event) => { // Make this async
+                    event.preventDefault();
+
+                    if (item.type === 'file') {
+                        if (item.name.endsWith('.py')) { // Only display .py files
+                            await fetchAndDisplayCode(item.download_url, codeContainer);
+                        }
+                    } else if (item.type === 'dir') {
+                        const newPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+                         // Clear previous list and fetch new contents
+                        codeContainer.innerHTML = ''; //clear
+                        const backButton = document.createElement('button');
+                        backButton.textContent = 'Back';
+                        backButton.addEventListener('click', () => {
+                            const parentPath = currentPath.split('/').slice(0, -1).join('/');
+                            fetchRepoContents(repoURL, codeContainer, parentPath);
+                        });
+                        codeContainer.appendChild(backButton);
+                        fetchRepoContents(repoURL, codeContainer, newPath);
+                    }
+                });
+
             }
+            // Clear and display
+            codeContainer.innerHTML = '';
+             // Add a "Back" button (if not at the root)
+            if (currentPath !== "") {
+                const backButton = document.createElement('button');
+                backButton.textContent = 'Back';
+                backButton.addEventListener('click', () => {
+                    const parentPath = currentPath.split('/').slice(0, -1).join('/');
+                    fetchRepoContents(repoURL, codeContainer, parentPath);
+                });
+                codeContainer.appendChild(backButton);
+          }
+            codeContainer.appendChild(fileList);
+
 
         } catch (error) {
-            codeContainer.innerHTML = `<p>Error: ${error.message}</p>`; //show errors
+            codeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
         }
     }
-    async function fetchCode(filename, codeContentElement, repoURL) {
+
+
+    async function fetchAndDisplayCode(downloadURL, container) {
         try {
-            // Construct the raw URL correctly (using "main" branch)
-            const baseURL = repoURL.replace("github.com", "raw.githubusercontent.com").replace(/\/$/, "").replace("/blob","");
-            const branch = "main";
-            const rawURL = `${baseURL}/${branch}/game/${filename}`; //added game
-
-            const response = await fetch(rawURL);
-
+            const response = await fetch(downloadURL);
             if (!response.ok) {
-                if (response.status === 404) {
-                    return; // File not found, just return (shouldn't happen, but good to handle)
-                }
-                throw new Error(`Failed to fetch ${filename}: ${response.status}`);
+                throw new Error(`Failed to fetch file content: ${response.status}`);
             }
-
             const codeText = await response.text();
-            codeContentElement.textContent += `\n// --- ${filename} ---\n${codeText}\n`;
+            const fileName = downloadURL.split('/').pop(); // Get filename
+
+             // Create a new <pre><code> block for each file
+            const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.textContent = `// --- ${fileName} ---\n${codeText}\n`;
+            pre.appendChild(code);
+            container.appendChild(pre);
 
         } catch (error) {
-                codeContentElement.textContent += `Error loading ${filename}: ${error.message}\n`;
+             const pre = document.createElement('pre');
+            const code = document.createElement('code');
+            code.textContent = `Error loading file content: ${error.message}`;
+            pre.appendChild(code);
+            container.appendChild(pre);
         }
     }
 });

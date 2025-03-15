@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const codeContent = document.querySelector('.code-content');
-    const githubLink = document.querySelector('a').href;
+    const githubLink = document.querySelector('a').href; // More robust link selection
 
-    // --- Dark Mode (Keep as is) ---
+    // --- Dark Mode Toggle (Keep as is) ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             darkModeToggle.textContent = "Toggle Light Mode"
         }
     });
-    // --- End Dark Mode ---
+    // --- End Dark Mode Toggle ---
 
     if (codeContent && githubLink) {
         fetchRepoContents(githubLink, codeContent, ""); // Start at the root
@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            //Keep consistent
             const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`;
 
             const response = await fetch(apiURL);
@@ -64,38 +63,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     if (item.type === 'file') {
                         if (item.name.endsWith('.py')) { // Only display .py files
-                            await fetchAndDisplayCode(item.download_url, codeContainer);
+                            codeContainer.innerHTML = ''; // Clear previous content!
+                            await fetchAndDisplayCode(item.download_url, codeContainer); //await to fetch
                         }
                     } else if (item.type === 'dir') {
                         const newPath = currentPath ? `${currentPath}/${item.name}` : item.name;
-                         // Clear previous list and fetch new contents
-                        codeContainer.innerHTML = ''; //clear
+                        // Clear previous list and fetch new contents
+                        codeContainer.innerHTML = ''; // Clear current contents
                         const backButton = document.createElement('button');
                         backButton.textContent = 'Back';
                         backButton.addEventListener('click', () => {
-                            const parentPath = currentPath.split('/').slice(0, -1).join('/');
-                            fetchRepoContents(repoURL, codeContainer, parentPath);
+                          const parentPath = currentPath.split('/').slice(0, -1).join('/');
+                          fetchRepoContents(repoURL, codeContainer, parentPath);
                         });
                         codeContainer.appendChild(backButton);
-                        fetchRepoContents(repoURL, codeContainer, newPath);
+
+                        fetchRepoContents(repoURL, codeContainer, newPath); //recursive call
                     }
                 });
 
             }
-            // Clear and display
+             // Clear and display
             codeContainer.innerHTML = '';
              // Add a "Back" button (if not at the root)
             if (currentPath !== "") {
                 const backButton = document.createElement('button');
                 backButton.textContent = 'Back';
                 backButton.addEventListener('click', () => {
-                    const parentPath = currentPath.split('/').slice(0, -1).join('/');
+                  const parentPath = currentPath.split('/').slice(0, -1).join('/');
                     fetchRepoContents(repoURL, codeContainer, parentPath);
                 });
                 codeContainer.appendChild(backButton);
           }
             codeContainer.appendChild(fileList);
-
 
         } catch (error) {
             codeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
@@ -111,14 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const codeText = await response.text();
             const fileName = downloadURL.split('/').pop(); // Get filename
-
-             // Create a new <pre><code> block for each file
+              // Create a new <pre><code> block for each file
             const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `// --- ${fileName} ---\n${codeText}\n`;
             pre.appendChild(code);
             container.appendChild(pre);
-
         } catch (error) {
              const pre = document.createElement('pre');
             const code = document.createElement('code');

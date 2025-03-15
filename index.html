@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device_width, initial_scale=1.0">
-    <title>Coding Portfolio</title>
+    <title>Josh Gilstrap - Coding Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Josh Gilstrap - Pygame Portfolio</h1>
-        <p>Welcome to my collection of programming projects!</p>
+        <h1>Josh Gilstrap</h1>
+        <nav>
+            <ul>
+                <li><a href='#'>Home</a></li>
+                <li><a href='#projects'>Projects</a></li>
+                <li><a href='#about'>About</a></li>
+                <li><a href='#contact'>Contact</a></li>
+            </ul>
+        </nav>
+        <button class="dark-mode-toggle">Toggle Dark Mode</button>
     </header>
 
     <main>
-        <section if="project2">
-            <h2>Space Fighter</h2>
-            <p>Beat the aliens!</p>
-
-            <div class="display-container">
-                <button id="toggle-btn-2">Toggle Code/Game</button>
-
-                <div id="game-container-2" class="game-container">
-                    <iframe src="space_fighter/index.html" width="800" height="600"></iframe>
+        <section id="projects">
+            <h2>Pygame Projects</h2>
+            <div class="project">
+                <h3>Space Fighter</h3>
+                <p class="project-description">A basic version of Space Invaders</p>
+                <iframe src="space_fighter/index.html" width="640" height="480" frameborder="0"></iframe>
+                <button class="toggle-code">Show Code</button>
+                <div class="code-container" style="display: none;">
+                    
                 </div>
-
-                <div id="code-container-2" class="code-container" style="display: none;">
-                    <pre><code id="code-content-2"></code></pre>
-                    <p>View on <a href="https://github.com/joshGilstrap/2D-platformer" target="_blank">GitHub</a></p>
+                <p><a href="https://github.com/joshGilstrap/Space-Fighter" target="_blank">View on GitHub</a></p>
+            </div>
+            <div class="project">
+                <h3>Labyrinth</h3>
+                <p class="project-description">A prototype block-psuhing puzzle game. Inspired by The Legend of Zelda: Oracle of Seasons/Ages</p>
+                <iframe src="labyrinth/labyrinth.html" width="800" height="600" frameborder="0"></iframe>
+                <button class="toggle-code">Show Code</button>
+                <div class="code-container" style="display: none;">
+                    
                 </div>
+                <p><a href="https://github.com/joshGilstrap/Labyrinth/tree/main/game" target="_blank">View on GitHub</a></p>
             </div>
         </section>
-        <section if="project1">
-            <h2>Labyrinth</h2>
-            <p>A prototype block-pushing puzzle game. Inspired by Zelda: Seasons/Ages</p>
+        <section id="about">
+            <h2>About Me</h2>
+        </section>
 
-            <div class="display-container">
-                <button id="toggle-btn-1">Toggle Code/Game</button>
-
-                <div id="game-container-1" class="game-container">
-                    <iframe src="labyrinth/labyrinth.html" width="640" height="480"></iframe>
-                </div>
-
-                <div id="code-container-1" class="code-container" style="display: none;">
-                    <pre><code id="code-content-1"></code></pre>
-                    <p>View on <a href="https://github.com/joshGilstrap/2D-platformer" target="_blank">GitHub</a></p>
-                </div>
-            </div>
+        <section id="contact">
+            <h2>Contact</h2>
         </section>
     </main>
 

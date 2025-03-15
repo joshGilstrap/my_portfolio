@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const githubLink = document.querySelector('a').href; // Get the GitHub link
+    const githubLink = document.querySelector('a').href;
     const codeContainer = document.querySelector(".code-container");
     const tabButtonsContainer = document.querySelector('.tab-buttons');
     const tabContentsContainer = document.querySelector('.tab-contents');
-
 
     // --- Dark Mode Toggle (Keep as is) ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
@@ -34,13 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchRepoContents(githubLink, ""); // Start at the root
     }
 
+
     async function fetchRepoContents(repoURL, currentPath) {
         try {
-            // Extract owner and repo name
+            // 1. Extract owner and repo name
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`; //added game
+            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/game/${currentPath}`;
 
             const response = await fetch(apiURL);
 
@@ -58,26 +58,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (currentPath !== "") {
                 const backButton = document.createElement('button');
                 backButton.textContent = 'Back';
-                backButton.classList.add('tab-button'); // Style it like a tab button
-                backButton.addEventListener('click', () => {
-                    const parentPath = currentPath.split('/').slice(0, -1).join('/');
-                    fetchRepoContents(repoURL,  parentPath); // Go up one level
-                });
-                tabButtonsContainer.appendChild(backButton); // Add to tab buttons
+                backButton.classList.add('tab-button');
+                backButton.dataset.path = currentPath.split('/').slice(0, -1).join('/'); // Store parent path
+                backButton.addEventListener('click', handleBackClick); // Use named function
+                tabButtonsContainer.appendChild(backButton);
             }
-
-            // Create tabs for files
+          // Create tabs for files ONLY
             for (const item of data) {
               if (item.type === 'file' && item.name.endsWith('.py')) {
                     await createTab(item.name, item.download_url);
-              } else if (item.type === 'dir') {
+              }  else if (item.type === 'dir') { //if directory
                     const dirButton = document.createElement('button');
                     dirButton.textContent = item.name + "/";
-                    dirButton.classList.add('tab-button'); //style
-                    dirButton.addEventListener('click', () => {
-                        const newPath = currentPath ? `${currentPath}/${item.name}` : item.name;
-                        fetchRepoContents(repoURL, newPath);
-                    });
+                    dirButton.classList.add('tab-button');
+                    dirButton.dataset.path = currentPath ? `${currentPath}/${item.name}` : item.name; // Store full path
+                    dirButton.addEventListener('click', handleDirClick); // Use named function
                 tabButtonsContainer.appendChild(dirButton);
               }
             }
@@ -88,15 +83,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 firstTabButton.click();
             }
 
+
         } catch (error) {
-             const pre = document.createElement('pre');
+            const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `Error: ${error.message}`;
             pre.appendChild(code);
-            tabContentsContainer.appendChild(pre); // Display errors
+            tabContentsContainer.appendChild(pre);
         }
     }
+    // Named function for handling directory clicks
+    function handleDirClick(event) {
+        event.preventDefault();
+        const newPath = event.target.dataset.path;
+        fetchRepoContents(githubLink, newPath); // Use stored githubLink
+    }
 
+    // Named function for handling back button clicks
+    function handleBackClick(event) {
+        event.preventDefault();
+        const parentPath = event.target.dataset.path;
+        fetchRepoContents(githubLink, parentPath); // Use stored githubLink
+    }
     async function createTab(filename, downloadURL) {
         // Create tab button
         const button = document.createElement('button');
@@ -110,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tabContent.classList.add('tab-content');
         tabContent.dataset.filename = filename;
 
-        // Fetch and add code to tab content
+        // Fetch and add code to tab content (no changes here)
         try {
             const response = await fetch(downloadURL);
             if (!response.ok) {
@@ -119,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const codeText = await response.text();
             const pre = document.createElement('pre');
             const code = document.createElement('code');
-            code.classList.add('file-content'); // Add the class for styling
+            code.classList.add('file-content');
             code.textContent = codeText;
             pre.appendChild(code);
             tabContent.appendChild(pre);
@@ -140,5 +148,4 @@ document.addEventListener('DOMContentLoaded', function() {
             tabContent.classList.add('active');
         });
     }
-
 });

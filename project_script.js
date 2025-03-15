@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/game/${currentPath}`; //added game
+            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`; //added game
 
             const response = await fetch(apiURL);
 

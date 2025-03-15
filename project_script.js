@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const codeContent = document.querySelector('.code-content');
     const githubLink = document.querySelector('a').href;
-// Dark Mode Toggle
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
@@ -25,24 +24,22 @@ document.addEventListener('DOMContentLoaded', function() {
             darkModeToggle.textContent = "Toggle Light Mode"
         }
     });
-    // --- End Dark Mode Toggle ---
-
-    // Fetch and display the code *immediately* on page load.
-    if (codeContent && githubLink) { // Check if elements exist
+    
+    if (codeContent && githubLink) {
         fetchCode('main.py', codeContent, githubLink);
-        fetchCode('level_loader.py', codeContent, githubLink); // Add other files as needed
+        fetchCode('level_loader.py', codeContent, githubLink);
     }
 
     async function fetchCode(filename, codeContentElement, repoURL) {
         try {
             const baseURL = repoURL.replace("github.com", "raw.githubusercontent.com").replace(/\/$/, "").replace("/blob", "");
-            const branch = "main"; // Or 'master'
+            const branch = "main";
             const rawURL = `${baseURL}/${branch}/${filename}`;
             const response = await fetch(rawURL);
 
             if (!response.ok) {
                  if (response.status === 404) {
-                    return; // File not found, just skip
+                    return;
                 }
                 throw new Error(`Failed to fetch ${filename}: ${response.status}`);
             }

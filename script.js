@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('mouseleave', () => {
         pauseGame(activeIframe);
-        // activeIframe = null;
+        activeIframe = null;
     })
 
     // Toggle code

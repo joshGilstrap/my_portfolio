@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function pauseGame(iframe) {
         if(iframe) {
-            iframe.contentElement.postMessage({type: "pause"}, '*');
+            iframe.contentWindow.postMessage({type: "pause"}, '*');
         }
     }
 

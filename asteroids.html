@@ -8,19 +8,32 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; /* Stack iframe and code vertically */
+            align-items: center; /* Center horizontally */
             min-height: 100vh;
             margin: 0;
-            background-color: var(--bg-color); /*Use css vars*/
+            padding: 1rem; /* Add some padding */
+            background-color: var(--bg-color);
         }
         iframe {
-            border: none;
+            border: 1px solid var(--project-border-color); /* Consistent border */
+            margin-bottom: 1rem; /* Space between iframe and code */
+        }
+        .code-container {
+            width: 100%; /* Take up full width */
+            max-width: 800px; /* Limit maximum width */
+            margin-top: 1rem;
+
         }
     </style>
 </head>
 <body>
-    <iframe src="asteroids/index.html" width="800" height="600"></iframe>
-     <script src="script.js"></script>
+    <button class="dark-mode-toggle">Toggle Dark Mode</button>
+    <iframe src="asteroids/index.html" width="800" height="600" frameborder="0"></iframe>
+    <div class="code-container">
+        <pre><code class="code-content"></code></pre>
+    </div>
+    <p><a href="https://github.com/joshGilstrap/Asteroids-Clone" target="_blank">View On GitHub</a></p>
+     <script src="project_script.js"></script>
 </body>
 </html>

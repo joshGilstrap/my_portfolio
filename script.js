@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
-    // Toggle themes
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme) {
         htmlElement.setAttribute('data-theme', currentTheme);
@@ -26,40 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Focus management
-    let activeIframe = null;
-
-    const iframes = document.querySelectorAll(".game-iframe");
-
-    function pauseGame(iframe) {
-        if(iframe) {
-            iframe.contentWindow.postMessage({type: "pause"}, '*');
-        }
-    }
-
-    function resumeGame(iframe) {
-        if(iframe) {
-            iframe.contentWindow.postMessage({type: "resume"}, '*');
-        }
-    }
-
-    iframes.forEach(iframe => {
-        iframe.classList.add("game-iframe");
-        iframe.addEventListener('mouseenter', () => {
-            if(activeIframe !== iframe) {
-                pauseGame(activeIframe);
-                activeIframe = iframe;
-                resumeGame(activeIframe);
-            }
-        });
-    });
-
-    document.addEventListener('mouseleave', () => {
-        pauseGame(activeIframe);
-        activeIframe = null;
-    })
-
-    // Toggle code
     toggleButtons.forEach(button => {
         button.addEventListener('click', function() {
             const projectContainer = button.closest('.project');
@@ -148,7 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
             codeContainer.innerHTML = `<p>Error: ${error.message}</p>`;
         }
     }
-
   async function fetchFileContent(downloadURL, container) {
     try {
         const response = await fetch(downloadURL);

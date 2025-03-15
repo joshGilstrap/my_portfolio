@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const codeContent = document.querySelector('.code-content');
+    const codeContent = document.querySelector('.code-content'); //  `<pre><code>`
     const githubLink = document.querySelector('a').href;
 
     // --- Dark Mode Toggle (Keep as is) ---
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme) {
         htmlElement.setAttribute('data-theme', currentTheme);
-          if (currentTheme === 'dark') {
+        if (currentTheme === 'dark') {
           darkModeToggle.textContent = "Toggle Light Mode"
         }
     }
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            const apiURL = `https://api.github.com/repos/<span class="math-inline">\{owner\}/</span>{repo}/contents/${currentPath}`;
+            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`;
 
             const response = await fetch(apiURL);
 
@@ -47,8 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            //Create list
+            // Create a *new* container for the file list.
+            const fileListContainer = document.createElement('div');
+            fileListContainer.classList.add('file-list'); // Add a class
+
             const fileList = document.createElement('ul');
+            fileListContainer.appendChild(fileList); // Add the <ul> to the container
+
 
             for (const item of data) {
                 const listItem = document.createElement('li');
@@ -58,31 +63,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 listItem.appendChild(link);
                 fileList.appendChild(listItem);
 
-                link.addEventListener('click', async (event) => { // Make this async
+                link.addEventListener('click', async (event) => {
                     event.preventDefault();
 
                     if (item.type === 'file') {
-                        if (item.name.endsWith('.py')) { // Only display .py files
-                            codeContainer.innerHTML = ''; // Clear previous content!
-                            await fetchAndDisplayCode(item.download_url, codeContainer); //await to fetch
+                        if (item.name.endsWith('.py')) {
+                            codeContainer.innerHTML = ''; // Clear *only* the code display area
+                            await fetchAndDisplayCode(item.download_url, codeContainer);
                         }
                     } else if (item.type === 'dir') {
-                        const newPath = currentPath ? `<span class="math-inline">\{currentPath\}/</span>{item.name}` : item.name;
-                         // Clear previous list and fetch new contents
-                        codeContainer.innerHTML = ''; // Clear current contents
+                        const newPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+
+                        //  *Don't* clear here!  We're about to replace the file list.
                         const backButton = document.createElement('button');
                         backButton.textContent = 'Back';
                         backButton.addEventListener('click', () => {
                            const parentPath = currentPath.split('/').slice(0, -1).join('/');
-                           fetchRepoContents(repoURL, codeContainer, parentPath);
+                           fetchRepoContents(repoURL, codeContainer, parentPath); // Go up one level
                         });
+                        // Replace entire contents of codeContainer with Back button and new file list
+                        codeContainer.innerHTML = ''; // Clear for Back button and new list
                         codeContainer.appendChild(backButton);
-                        fetchRepoContents(repoURL, codeContainer, newPath); //recursive call
+                        fetchRepoContents(repoURL, codeContainer, newPath); // Recursive call
                     }
                 });
-
             }
-             // Clear and display
+            //Clear
             codeContainer.innerHTML = '';
               // Add a "Back" button (if not at the root)
             if (currentPath !== "") {
@@ -94,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 codeContainer.appendChild(backButton);
           }
-            codeContainer.appendChild(fileList);
+            codeContainer.appendChild(fileListContainer); // Add the *container*
 
 
         } catch (error) {
@@ -114,11 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
               // Create a new <pre><code> block for each file
             const pre = document.createElement('pre');
             const code = document.createElement('code');
-            code.textContent = `// --- <span class="math-inline">\{fileName\} \-\-\-\\n</span>{codeText}\n`;
+            code.textContent = `// --- ${fileName} ---\n${codeText}\n`;
             pre.appendChild(code);
             container.appendChild(pre);
         } catch (error) {
-             const pre = document.createElement('pre');
+            const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `Error loading file content: ${error.message}`;
             pre.appendChild(code);

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabContentsContainer = document.querySelector('.tab-contents');
 
     // --- Dark Mode Toggle (Keep as is) ---
-    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+      const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
     const currentTheme = localStorage.getItem('theme');
@@ -33,8 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchRepoContents(githubLink, ""); // Start at the root
     }
 
-
-    async function fetchRepoContents(repoURL, currentPath) {
+    async function fetchRepoContents(repoURL,  currentPath) {
         try {
             // 1. Extract owner and repo name
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
@@ -49,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const data = await response.json();
-
             // Clear existing tabs (buttons and content)
             tabButtonsContainer.innerHTML = '';
             tabContentsContainer.innerHTML = '';
@@ -83,15 +81,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 firstTabButton.click();
             }
 
-
         } catch (error) {
             const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `Error: ${error.message}`;
             pre.appendChild(code);
-            tabContentsContainer.appendChild(pre);
+            tabContentsContainer.appendChild(pre); // Display errors
         }
     }
+
     // Named function for handling directory clicks
     function handleDirClick(event) {
         event.preventDefault();
@@ -105,8 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const parentPath = event.target.dataset.path;
         fetchRepoContents(githubLink, parentPath); // Use stored githubLink
     }
+
     async function createTab(filename, downloadURL) {
-        // Create tab button
+       //Create button
         const button = document.createElement('button');
         button.textContent = filename;
         button.classList.add('tab-button');
@@ -118,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tabContent.classList.add('tab-content');
         tabContent.dataset.filename = filename;
 
-        // Fetch and add code to tab content (no changes here)
+        // Fetch and add code to tab content
         try {
             const response = await fetch(downloadURL);
             if (!response.ok) {

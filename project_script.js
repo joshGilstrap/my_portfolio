@@ -63,26 +63,27 @@ document.addEventListener('DOMContentLoaded', function() {
             tabContentsContainer.innerHTML = '';
 
             // Add a "Back" button (if not at the root)
-            if (currentPath !== "") {
-                const backButton = document.createElement('button');
-                backButton.textContent = 'Back';
-                backButton.classList.add('tab-button');
-                backButton.dataset.path = currentPath.split('/').slice(0, -1).join('/'); // Store parent path
-                backButton.addEventListener('click', handleBackClick); // Use named function
-                tabButtonsContainer.appendChild(backButton);
-            }
+            // if (currentPath !== "") {
+            //     const backButton = document.createElement('button');
+            //     backButton.textContent = 'Back';
+            //     backButton.classList.add('tab-button');
+            //     backButton.dataset.path = currentPath.split('/').slice(0, -1).join('/'); // Store parent path
+            //     backButton.addEventListener('click', handleBackClick); // Use named function
+            //     tabButtonsContainer.appendChild(backButton);
+            // }
           // Create tabs for files ONLY
             for (const item of data) {
               if (item.type === 'file' && item.name.endsWith('.py')) {
                     await createTab(item.name, item.download_url);
-              }  else if (item.type === 'dir') { //if directory
-                    const dirButton = document.createElement('button');
-                    dirButton.textContent = item.name + "/";
-                    dirButton.classList.add('tab-button');
-                    dirButton.dataset.path = currentPath ? `${currentPath}/${item.name}` : item.name; // Store full path
-                    dirButton.addEventListener('click', handleDirClick); // Use named function
-                tabButtonsContainer.appendChild(dirButton);
-              }
+              }  
+            //   else if (item.type === 'dir') { //if directory
+            //         const dirButton = document.createElement('button');
+            //         dirButton.textContent = item.name + "/";
+            //         dirButton.classList.add('tab-button');
+            //         dirButton.dataset.path = currentPath ? `${currentPath}/${item.name}` : item.name; // Store full path
+            //         dirButton.addEventListener('click', handleDirClick); // Use named function
+            //     tabButtonsContainer.appendChild(dirButton);
+            //   }
             }
 
             // Activate the first tab by default (if there are any)

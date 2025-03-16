@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const githubLink = document.querySelector('a').href;
+    const codeContainer = document.querySelector(".code-container");
     const tabButtonsContainer = document.querySelector('.tab-buttons');
     const tabContentsContainer = document.querySelector('.tab-contents');
 
@@ -92,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         } catch (error) {
-            console.error("Error in fetchRepoContents:", error); // More detailed error
             const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `Error: ${error.message}`;

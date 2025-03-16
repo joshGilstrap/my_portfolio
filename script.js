@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Dark Mode Toggle ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
@@ -22,5 +21,4 @@ document.addEventListener('DOMContentLoaded', function() {
             darkModeToggle.textContent = "Toggle Light Mode"
         }
     });
-    // --- End Dark Mode Toggle ---
 });

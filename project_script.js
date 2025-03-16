@@ -29,18 +29,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // --- End Dark Mode Toggle ---
 
-
     if (githubLink) {
-        fetchRepoContents(githubLink); // No path needed
+        fetchRepoContents(githubLink, ""); // Start at the root
     }
 
-    async function fetchRepoContents(repoURL) {
+    async function fetchRepoContents(repoURL, currentPath) {
         try {
             // 1. Extract owner and repo name
             const urlParts = repoURL.replace("https://github.com/", "").split("/");
             const owner = urlParts[0];
             const repo = urlParts[1];
-            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents`; // Fetch root
+            const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${currentPath}`;
 
             const response = await fetch(apiURL);
 
@@ -50,15 +49,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            // Clear existing tabs
+            // Clear existing tabs (buttons and content)
             tabButtonsContainer.innerHTML = '';
             tabContentsContainer.innerHTML = '';
 
-            // Create tabs for .py files ONLY
+            // Add a "Back" button (if not at the root)
+            if (currentPath !== "") {
+                const backButton = document.createElement('button');
+                backButton.textContent = 'Back';
+                backButton.classList.add('tab-button');
+                backButton.dataset.path = currentPath.split('/').slice(0, -1).join('/'); // Store parent path
+                backButton.addEventListener('click', handleBackClick); // Use named function
+                tabButtonsContainer.appendChild(backButton);
+            }
+          // Create tabs for files ONLY
             for (const item of data) {
-                if (item.type === 'file' && item.name.endsWith('.py')) {
-                    await createTab(item.name, item.download_url);
-                }
+              if (item.type === 'file' && item.name.endsWith('.py')) {
+                    await createTab(item.name, item.download_url); // Pass download_url
+              }  else if (item.type === 'dir') { //if directory
+                    const dirButton = document.createElement('button');
+                    dirButton.textContent = item.name + "/";
+                    dirButton.classList.add('tab-button');
+                    dirButton.dataset.path = currentPath ? `${currentPath}/${item.name}` : item.name; // Store full path
+                    dirButton.addEventListener('click', handleDirClick); // Use named function
+                tabButtonsContainer.appendChild(dirButton);
+              }
             }
 
             // Activate the first tab by default (if there are any)
@@ -67,61 +82,83 @@ document.addEventListener('DOMContentLoaded', function() {
                 firstTabButton.click();
             }
 
+
         } catch (error) {
             const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `Error: ${error.message}`;
             pre.appendChild(code);
-            tabContentsContainer.appendChild(pre);
+            tabContentsContainer.appendChild(pre); // Display errors
         }
     }
+      // Named function for handling directory clicks
+    function handleDirClick(event) {
+        event.preventDefault();
+        const newPath = event.target.dataset.path;
+        fetchRepoContents(githubLink,  newPath); // Use stored githubLink
+    }
 
+    // Named function for handling back button clicks
+    function handleBackClick(event) {
+        event.preventDefault();
+        const parentPath = event.target.dataset.path;
+        fetchRepoContents(githubLink, parentPath); // Use stored githubLink
+    }
 
     async function createTab(filename, downloadURL) {
-        // Create tab button
-        const button = document.createElement('button');
-        button.textContent = filename;
-        button.classList.add('tab-button');
-        button.dataset.filename = filename;
-        tabButtonsContainer.appendChild(button);
+        // Check if tab already exists
+        let button = tabButtonsContainer.querySelector(`[data-filename="${filename}"]`);
+        let tabContent = tabContentsContainer.querySelector(`[data-filename="${filename}"]`);
 
-        // Create tab content container
-        const tabContent = document.createElement('div');
-        tabContent.classList.add('tab-content');
-        tabContent.dataset.filename = filename;
+        if (!button) { // Create new tab elements ONLY if they don't exist
+            button = document.createElement('button');
+            button.textContent = filename;
+            button.classList.add('tab-button');
+            button.dataset.filename = filename;
+            button.dataset.downloadurl = downloadURL; // Store download URL
+            tabButtonsContainer.appendChild(button);
 
-        // Fetch and add code to tab content
-        try {
-            const response = await fetch(downloadURL);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch ${filename}: ${response.status}`);
+            tabContent = document.createElement('div');
+            tabContent.classList.add('tab-content');
+            tabContent.dataset.filename = filename;
+            tabContentsContainer.appendChild(tabContent);
+
+            // Fetch and add code to tab content
+            try {
+                const response = await fetch(downloadURL);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${filename}: ${response.status}`);
+                }
+                const codeText = await response.text();
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.classList.add('file-content');
+                code.textContent = codeText;
+                pre.appendChild(code);
+                tabContent.appendChild(pre);
+            } catch (error) {
+                tabContent.innerHTML = `<pre><code>Error loading ${filename}: ${error.message}</code></pre>`;
             }
-            const codeText = await response.text();
-            const pre = document.createElement('pre');
-            const code = document.createElement('code');
-            code.classList.add('file-content');
-            code.textContent = codeText;
-            pre.appendChild(code);
-            tabContent.appendChild(pre);
-        } catch (error) {
-             const pre = document.createElement('pre');
-            const code = document.createElement('code');
-            code.textContent = `Error loading ${filename}: ${error.message}`;
-            pre.appendChild(code);
-            tabContentsContainer.appendChild(pre);
-        }
 
-        tabContentsContainer.appendChild(tabContent);
+             // Add click event listener to the button
+            button.addEventListener('click', () => {
+                // Deactivate all tabs
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-        // Add click event listener to the button (no changes here)
-        button.addEventListener('click', () => {
+                // Activate the clicked tab
+                button.classList.add('active');
+                tabContent.classList.add('active');
+            });
+        } else { //if it exists
             // Deactivate all tabs
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            // Activate the clicked tab
-            button.classList.add('active');
-            tabContent.classList.add('active');
-        });
+                // Activate the clicked tab
+                button.classList.add('active');
+                tabContent.classList.add('active');
+        }
     }
+
 });

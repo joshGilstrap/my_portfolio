@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    async function fetchRepoContents(repoURL, currentPath) {
+        async function fetchRepoContents(repoURL, currentPath) {
         try {
             // 1. Extract owner and repo name
             const urlParts = repoURL.replace("https://github.com/", "").split("/");

@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const githubLink = document.querySelector('a').href;
-    const codeContainer = document.querySelector(".code-container");
     const tabButtonsContainer = document.querySelector('.tab-buttons');
     const tabContentsContainer = document.querySelector('.tab-contents');
 
-    // --- Dark Mode Toggle (Keep as is) ---
+    // --- Dark Mode Toggle ---
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const htmlElement = document.documentElement;
 
@@ -28,6 +27,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     // --- End Dark Mode Toggle ---
+
+    // --- Close Tab Button ---
+    const closeTabButton = document.querySelector('.close-tab-button');
+    if (closeTabButton) { // Check if the button exists
+        closeTabButton.addEventListener('click', () => {
+            window.close(); // Close the current tab/window
+        });
+    }
+    // --- End Close Tab Button ---
 
     if (githubLink) {
         fetchRepoContents(githubLink, ""); // Start at the root
@@ -65,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Create tabs for files ONLY
             for (const item of data) {
               if (item.type === 'file' && item.name.endsWith('.py')) {
-                    await createTab(item.name, item.download_url); // Pass download_url
+                    await createTab(item.name, item.download_url);
               }  else if (item.type === 'dir') { //if directory
                     const dirButton = document.createElement('button');
                     dirButton.textContent = item.name + "/";
@@ -84,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         } catch (error) {
+            console.error("Error in fetchRepoContents:", error); // More detailed error
             const pre = document.createElement('pre');
             const code = document.createElement('code');
             code.textContent = `Error: ${error.message}`;
@@ -91,11 +100,11 @@ document.addEventListener('DOMContentLoaded', function() {
             tabContentsContainer.appendChild(pre); // Display errors
         }
     }
-      // Named function for handling directory clicks
+    // Named function for handling directory clicks
     function handleDirClick(event) {
         event.preventDefault();
         const newPath = event.target.dataset.path;
-        fetchRepoContents(githubLink,  newPath); // Use stored githubLink
+        fetchRepoContents(githubLink, newPath); // Use stored githubLink
     }
 
     // Named function for handling back button clicks
@@ -137,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 pre.appendChild(code);
                 tabContent.appendChild(pre);
             } catch (error) {
+              console.error("Error fetching file content:", error); // Log specific error
                 tabContent.innerHTML = `<pre><code>Error loading ${filename}: ${error.message}</code></pre>`;
             }
 
@@ -160,5 +170,4 @@ document.addEventListener('DOMContentLoaded', function() {
                 tabContent.classList.add('active');
         }
     }
-
 });

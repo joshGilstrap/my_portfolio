@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const closeTabButton = document.querySelector('.close-tab-button');
+    const closeTabButton = document.querySelector('close-tab-button');
     if (closeTabButton) {
         closeTabButton.addEventListener('click', () => {
             window.close();

@@ -33,21 +33,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Project Data (Store project information) ---
     const projectData = {
         project1: {
-            title: "Project 1 Title",
+            title: "Asteroids",
             description: "Short description of Project 1.",
-            pageSrc: "project1.html", // Use pageSrc instead of iframeSrc
-            githubLink: "https://github.com/yourusername/project1-repo" // Replace with your actual repo URL
+            pageSrc: "asteroids/index.html", // Use pageSrc instead of iframeSrc
+            githubLink: "https://github.com/joshGilstrap/Asteroids-Clone" // Replace with your actual repo URL
         },
         project2: {
             title: "Project 2 Title",
             description: "Short description of Project 2.",
-            pageSrc: "project2.html", // Use pageSrc
+            pageSrc: "star_wars_arcade/index.html", // Use pageSrc
             githubLink: "https://github.com/yourusername/project2-repo" // Replace
         },
         project3: {
             title: "Project 3 Title",
             description: "Short description of Project 3",
-            pageSrc: "project3.html", // Use pageSrc
+            pageSrc: "space_fighter/index.html", // Use pageSrc
             githubLink: "https://github.com/yourusername/project3-repo"
         }
         // Add more projects as needed

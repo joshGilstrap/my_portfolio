@@ -117,7 +117,6 @@ main {
     border: 1px solid var(--project-border-color);
 }
 
-/* Add dark mode toggle button styles */
 
 .dark-mode-toggle {
     background-color: var(--button-bg-color);
@@ -126,7 +125,7 @@ main {
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    margin-bottom: 1rem; /* Add some space below the button */
+    margin-bottom: 1rem;
     transition: background-color 0.3s;
 }
 

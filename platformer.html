@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Platformer</title>
      <link rel="stylesheet" href="style.css">
+     <link rel="stylesheet" href="prism/prism.css"> 
     <style>
         body {
             display: flex;
@@ -76,17 +77,68 @@
         .close-tab-button:hover {
             background-color: var(--button-hover-bg-color);
         }
+        .game-description {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--project-border-color);
+            padding: 1rem;
+            background-color: var(--project-bg-color);
+            border-radius: 8px;
+        }
+        .game-description h2 {
+            color: var(--link-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--project-border-color);
+            padding-bottom: 0.25rem;
+        }
+
+        .game-description h3 {
+            color: var(--link-color);
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-description p {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .game-description ul {
+          list-style: disc;
+          margin-left: 20px;
+        }
     </style>
 </head>
 <body>
     <button class="dark-mode-toggle">Toggle Dark Mode</button>
     <button class="close-tab-button">Close Tab</button>
     <iframe src="platformer/index.html" width="800" height="600" frameborder="0"></iframe>
+    <div class="game-description">
+        <h2>Platformer</h2>
+
+        <h3>Description</h3>
+        <p>
+            A generic platformer that features jumping, wall jumps, double jumps, bouncing off enemies, bouncing off hazards, 
+            shooting enemies, and collectibles. Mostly inspired by Mario and Megaman. There is only one level and no objective, 
+            this was developed to be an open-ended educational tool to teach programming.
+        </p>
+
+        <h3>Instructions</h3>
+        <p>
+            Jump, shoot, and collect your way to victory. (Victory not included).
+        </p>
+        <ul>
+            <li><strong>Controls:</strong>  Arrow Keys to move. Space Bar to jump. F key to shoot. R to reset.</li>
+            <li><strong>Objective:</strong> There are a total of 16 collectibles in the level. Try to find all of them!</li>
+        </ul>
+    </div>
     <div class="code-container">
         <div class="tab-buttons"></div>
         <div class="tab-contents"></div>
     </div>
     <p><a href="https://github.com/joshGilstrap/2D-platformer" target="_blank">View On GitHub</a></p>
      <script src="project_script.js"></script>
+     <script src="prism/prism.js"></script>
 </body>
 </html>

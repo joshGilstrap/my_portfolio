@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
             button.textContent = filename;
             button.classList.add('tab-button');
             button.dataset.filename = filename;
-            button.dataset.downloadurl = downloadURL;
+            // button.dataset.downloadurl = downloadURL;
             tabButtonsContainer.appendChild(button);
 
             tabContent = document.createElement('div');
@@ -102,13 +102,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const codeText = await response.text();
                 const pre = document.createElement('pre');
                 const code = document.createElement('code');
+                code.classList.add('language-python');
                 code.classList.add('file-content');
                 code.textContent = codeText;
                 pre.appendChild(code);
                 tabContent.appendChild(pre);
+
+                Prism.highlightElement(code);
             } catch (error) {
               console.error("Error fetching file content:", error);
-                tabContent.innerHTML = `<pre><code>Error loading ${filename}: ${error.message}</code></pre>`;
+                tabContent.innerHTML = `<pre><code class="language-python">Error loading ${filename}: ${error.message}</code></pre>`;
             }
 
             button.addEventListener('click', () => {

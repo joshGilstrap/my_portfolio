@@ -114,6 +114,24 @@ main {
     border: 1px solid var(--project-border-color);
 }
 
+.image-row {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.project-screenshot {
+    height: auto;
+    max-height: 200px;
+    border: 1px solid var(--project-border-color);
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
 
 .dark-mode-toggle {
     background-color: var(--button-bg-color);

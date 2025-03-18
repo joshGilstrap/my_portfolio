@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Star Wars Arcade</title>
      <link rel="stylesheet" href="style.css">
+     <link rel="stylesheet" href="prism/prism.css"> 
     <style>
         body {
             display: flex;
@@ -77,17 +78,72 @@
         .close-tab-button:hover {
             background-color: var(--button-hover-bg-color);
         }
+        .game-description {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--project-border-color);
+            padding: 1rem;
+            background-color: var(--project-bg-color);
+            border-radius: 8px;
+        }
+
+        .game-description h2 {
+            color: var(--link-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--project-border-color);
+            padding-bottom: 0.25rem;
+        }
+
+        .game-description h3 {
+            color: var(--link-color);
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-description p {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .game-description ul {
+          list-style: disc;
+          margin-left: 20px;
+        }
     </style>
 </head>
 <body>
     <button class="dark-mode-toggle">Toggle Dark Mode</button>
     <button class="close-tab-button">Close Tab</button>
     <iframe src="star_wars_arcade/index.html" width="800" height="600" frameborder="0"></iframe>
+    <div class="game-description">
+        <h2>Star Wars Arcade</h2>
+
+        <h3>Description</h3>
+        <p>
+            A clone of the 1983 arcade game Star Wars Arcade. Fight through 5 waves of Tie Fighters! Use your mouse to shoot
+            them and the fireballs they fling. The original game was a revolutionary for vector graphics and the look of it inspired me.
+            Everything you see is drawn using built-in pygame drawing functions. It produced a lot of code and was incredibly tedious but
+            the end result was worth it. Future updates may bring better Tie Fighter graphics and different kinds of levels.
+
+            All code is viewable underneath the game!
+        </p>
+
+        <h3>Instructions</h3>
+        <p>
+            Shoot all the Tie Fighters! You have a sheild that can take 9 hits before you're in danger!
+        </p>
+        <ul>
+            <li><strong>Controls:</strong>  Use your mouse to move the cursor and click the button to fire.</li>
+            <li><strong>Objective:</strong>  Complete all waves of enemies. Each wave brings more enemies.</li>
+        </ul>
+    </div>
     <div class="code-container">
         <div class="tab-buttons"></div>
         <div class="tab-contents"></div>
     </div>
     <p><a href="https://github.com/joshGilstrap/Star-Wars-Arcade-1983" target="_blank">View On GitHub</a></p>
-     <script src="project_script.js"></script>
+    <script src="project_script.js"></script>
+    <script src="prism/prism.js"></script>
 </body>
 </html>

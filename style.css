@@ -1,5 +1,4 @@
 :root {
-    /* Light Mode Colors */
     --bg-color: #f4f4f4;
     --text-color: #333;
     --header-bg-color: #333;
@@ -16,7 +15,6 @@
     --code-container-border-color: #ddd;
 }
 
-/* Dark Mode Colors (inside a data attribute selector) */
 [data-theme="dark"] {
     --bg-color: #121212;
     --text-color: #eee;
@@ -34,7 +32,6 @@
     --code-container-border-color: #555;
 }
 
-/* General Styles (using the variables) */
 body {
     font-family: sans-serif;
     margin: 0;
